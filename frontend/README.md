@@ -1,0 +1,1 @@
+This folder will contain the Vue.js/React.js code for the ExoGenesis frontend.

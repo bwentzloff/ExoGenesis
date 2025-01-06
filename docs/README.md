@@ -1,0 +1,1 @@
+This folder contains design documents, plans, and project details.

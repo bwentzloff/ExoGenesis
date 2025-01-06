@@ -1,0 +1,1 @@
+This folder will contain the FastAPI code for the ExoGenesis backend.
