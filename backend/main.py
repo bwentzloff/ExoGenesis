@@ -5,7 +5,17 @@ from sqlalchemy.sql import text
 from models import Star, Planet, Civilization
 from db import get_db
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080","http://localhost:8000","http://127.0.0.1:8080","http://127.0.0.1:8000"],  # Frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
