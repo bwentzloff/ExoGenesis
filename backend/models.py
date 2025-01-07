@@ -20,6 +20,8 @@ class Planet(Base):
     type = Column(String, nullable=False)
     star_id = Column(Integer, ForeignKey("stars.id"))
     star = relationship("Star", back_populates="planets")
+    size = Column(Float, nullable=False)  # Represented as a radius
+    orbital_distance = Column(Float, nullable=False)  # Distance from star
 
     civilizations = relationship("Civilization", back_populates="planet")
 

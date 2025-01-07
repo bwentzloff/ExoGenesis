@@ -14,8 +14,6 @@
       },
     },
     mounted() {
-        const plainGalaxy = JSON.parse(JSON.stringify(this.galaxy)); // Convert to plain array
-  console.log("Converted galaxy data:", plainGalaxy);
       // Three.js objects declared as regular variables
       let scene, camera, renderer;
   
@@ -42,15 +40,39 @@
   
         // Add Stars (using a plain array)
         this.galaxy.forEach((star, index) => {
+          const starColors = {
+                O: 0x9bb0ff, // Blue
+                B: 0xaabfff, // Blue-white
+                A: 0xcad7ff, // White
+                F: 0xf8f7ff, // Yellow-white
+                G: 0xfff4e8, // Yellow
+                K: 0x9bb0ff, // Blue
+                M: 0xffaa80, // Red
+          };
+          console.log(star)
+          const color = starColors[star.type.charAt(0).toUpperCase()] || 0xffffff;
+          console.log(color)
           const starGeometry = new THREE.SphereGeometry(3, 16, 16);
-          const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+          const starMaterial = new THREE.MeshBasicMaterial({ color: color });
           const starMesh = new THREE.Mesh(starGeometry, starMaterial);
 
           // Position stars
           starMesh.position.set(star.x_position, star.y_position, 0);
   
-          console.log(`Adding star ${index} to scene at position:`, starMesh.position);
           scene.add(starMesh);
+          // Add planets for this star
+          star.planets.forEach((planet) => {
+            const planetGeometry = new THREE.SphereGeometry(planet.size / 5, 16, 16);
+            const planetMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const planetMesh = new THREE.Mesh(planetGeometry, planetMaterial);
+
+            planetMesh.position.set(
+                star.x_position + planet.orbital_distance,
+                star.y_position,
+                0
+            );
+            scene.add(planetMesh);
+          });
         });
   
         // Render Loop

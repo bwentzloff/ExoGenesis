@@ -22,14 +22,15 @@ def read_root():
     return {"message": "Welcome to ExoGenesis!"}
 
 @app.post("/generate-galaxy")
-async def generate_galaxy(db: AsyncSession = Depends(get_db)):
+async def generate_galaxy(db: AsyncSession = Depends(get_db), num_stars: int = 10):
     # Clear existing stars
-    db.query(Star).delete()
+    await db.execute(text("DELETE FROM planets"))
+    await db.execute(text("DELETE FROM stars"))
     db.commit()
 
     # Generate stars
     stars = []
-    for i in range(10):
+    for i in range(num_stars):
         star = Star(
             name=f"Star-{i}",
             type=random.choice(["G-type", "K-type", "M-type"]),
@@ -47,6 +48,8 @@ async def generate_galaxy(db: AsyncSession = Depends(get_db)):
             planet = Planet(
                 name=f"Planet-{star.id}-{j}",
                 type=random.choice(["Rocky", "Gas Giant", "Icy"]),
+                size=random.uniform(0.5, 3.0),  # Planet radius in arbitrary units
+                orbital_distance=random.uniform(0.1, 10.0),  # Distance in arbitrary units
                 star_id=star.id,
             )
             db.add(planet)
@@ -65,7 +68,7 @@ async def generate_galaxy(db: AsyncSession = Depends(get_db)):
 @app.get("/galaxy")
 async def get_galaxy(db: AsyncSession = Depends(get_db)):
     # Fetch stars with their planets and civilizations
-    query = await db.execute(text("SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type, s.x_position, s.y_position ,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"))
+    query = await db.execute(text("SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type, s.x_position, s.y_position ,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type, p.size, p.orbital_distance,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"))
     results = query.fetchall()
 
     # Structure the response
@@ -84,6 +87,8 @@ async def get_galaxy(db: AsyncSession = Depends(get_db)):
                 "id": row.planet_id,
                 "name": row.planet_name,
                 "type": row.planet_type,
+                "size": row.size,
+                "orbital_distance": row.orbital_distance,
                 "civilization": None
             }
             if row.civ_id:
