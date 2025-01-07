@@ -11,15 +11,22 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080","http://localhost:8000","http://127.0.0.1:8080","http://127.0.0.1:8000"],  # Frontend URL
+    allow_origins=[
+        "http://localhost:8080",
+        "http://localhost:8000",
+        "http://127.0.0.1:8080",
+        "http://127.0.0.1:8000",
+    ],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to ExoGenesis!"}
+
 
 @app.post("/generate-galaxy")
 async def generate_galaxy(db: AsyncSession = Depends(get_db), num_stars: int = 10):
@@ -49,7 +56,9 @@ async def generate_galaxy(db: AsyncSession = Depends(get_db), num_stars: int = 1
                 name=f"Planet-{star.id}-{j}",
                 type=random.choice(["Rocky", "Gas Giant", "Icy"]),
                 size=random.uniform(0.5, 3.0),  # Planet radius in arbitrary units
-                orbital_distance=random.uniform(0.1, 10.0),  # Distance in arbitrary units
+                orbital_distance=random.uniform(
+                    0.1, 10.0
+                ),  # Distance in arbitrary units
                 star_id=star.id,
             )
             db.add(planet)
@@ -65,22 +74,30 @@ async def generate_galaxy(db: AsyncSession = Depends(get_db), num_stars: int = 1
 
     return {"message": "Galaxy generated successfully!"}
 
+
 @app.get("/galaxy")
 async def get_galaxy(db: AsyncSession = Depends(get_db)):
     # Fetch stars with their planets and civilizations
-    query = await db.execute(text("SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type, s.x_position, s.y_position ,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type, p.size, p.orbital_distance,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"))
+    query = await db.execute(
+        text(
+            "SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type, s.x_position, s.y_position ,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type, p.size, p.orbital_distance,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"  # noqa: E501
+        )
+    )
     results = query.fetchall()
 
     # Structure the response
     galaxy = {}
     for row in results:
-        star = galaxy.setdefault(row.star_id, {
-            "name": row.star_name,
-            "type": row.star_type,
-            "x_position": row.x_position,
-            "y_position": row.y_position,
-            "planets": []
-        })
+        star = galaxy.setdefault(
+            row.star_id,
+            {
+                "name": row.star_name,
+                "type": row.star_type,
+                "x_position": row.x_position,
+                "y_position": row.y_position,
+                "planets": [],
+            },
+        )
 
         if row.planet_id:
             planet = {
@@ -89,13 +106,10 @@ async def get_galaxy(db: AsyncSession = Depends(get_db)):
                 "type": row.planet_type,
                 "size": row.size,
                 "orbital_distance": row.orbital_distance,
-                "civilization": None
+                "civilization": None,
             }
             if row.civ_id:
-                planet["civilization"] = {
-                    "id": row.civ_id,
-                    "name": row.civ_name
-                }
+                planet["civilization"] = {"id": row.civ_id, "name": row.civ_name}
             star["planets"].append(planet)
 
     return galaxy

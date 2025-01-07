@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import Galaxy3D from "@/components/Galaxy3D";
-import { getGalaxy } from "@/services/api";
+import Galaxy3D from '@/components/Galaxy3D'
+import { getGalaxy } from '@/services/api'
 
 export default {
   components: {
@@ -17,20 +17,20 @@ export default {
     return {
       galaxyData: [], // Initialize as an empty array
       loading: true,
-    };
+    }
   },
   async created() {
     try {
-      const galaxyObject = await getGalaxy();
-      this.galaxyData = Object.values(galaxyObject);
-      console.log("Galaxy data in App.vue after fetching:", this.galaxyData);
+      const galaxyObject = await getGalaxy()
+      this.galaxyData = Object.values(galaxyObject)
+      console.log('Galaxy data in App.vue after fetching:', this.galaxyData)
     } catch (error) {
-      console.error("Failed to fetch galaxy data:", error);
+      console.error('Failed to fetch galaxy data:', error)
     } finally {
-      this.loading = false;
+      this.loading = false
     }
-  }
-};
+  },
+}
 </script>
 
 <style>

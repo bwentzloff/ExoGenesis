@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
 
+
 class Star(Base):
     __tablename__ = "stars"
     id = Column(Integer, primary_key=True, index=True)
@@ -12,6 +13,7 @@ class Star(Base):
     y_position = Column(Float, nullable=False)
 
     planets = relationship("Planet", back_populates="star")
+
 
 class Planet(Base):
     __tablename__ = "planets"
@@ -24,6 +26,7 @@ class Planet(Base):
     orbital_distance = Column(Float, nullable=False)  # Distance from star
 
     civilizations = relationship("Civilization", back_populates="planet")
+
 
 class Civilization(Base):
     __tablename__ = "civilizations"
