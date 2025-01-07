@@ -45,13 +45,9 @@
           const starGeometry = new THREE.SphereGeometry(3, 16, 16);
           const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
           const starMesh = new THREE.Mesh(starGeometry, starMaterial);
-  
+
           // Position stars
-          starMesh.position.set(
-            star.x_position || Math.random() * 200 - 100,
-            star.y_position || Math.random() * 200 - 100,
-            0
-          );
+          starMesh.position.set(star.x_position, star.y_position, 0);
   
           console.log(`Adding star ${index} to scene at position:`, starMesh.position);
           scene.add(starMesh);

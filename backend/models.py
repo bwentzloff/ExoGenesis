@@ -8,8 +8,8 @@ class Star(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
-    x_position = Column(Float)
-    y_position = Column(Float)
+    x_position = Column(Float, nullable=False)
+    y_position = Column(Float, nullable=False)
 
     planets = relationship("Planet", back_populates="star")
 

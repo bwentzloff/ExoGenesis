@@ -23,6 +23,10 @@ def read_root():
 
 @app.post("/generate-galaxy")
 async def generate_galaxy(db: AsyncSession = Depends(get_db)):
+    # Clear existing stars
+    db.query(Star).delete()
+    db.commit()
+
     # Generate stars
     stars = []
     for i in range(10):
@@ -61,7 +65,7 @@ async def generate_galaxy(db: AsyncSession = Depends(get_db)):
 @app.get("/galaxy")
 async def get_galaxy(db: AsyncSession = Depends(get_db)):
     # Fetch stars with their planets and civilizations
-    query = await db.execute(text("SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"))
+    query = await db.execute(text("SELECT s.id AS star_id, s.name AS star_name, s.type AS star_type, s.x_position, s.y_position ,p.id AS planet_id, p.name AS planet_name, p.type AS planet_type,c.id AS civ_id, c.name AS civ_name FROM stars s LEFT JOIN planets p ON s.id = p.star_id LEFT JOIN civilizations c ON p.id = c.planet_id"))
     results = query.fetchall()
 
     # Structure the response
@@ -70,6 +74,8 @@ async def get_galaxy(db: AsyncSession = Depends(get_db)):
         star = galaxy.setdefault(row.star_id, {
             "name": row.star_name,
             "type": row.star_type,
+            "x_position": row.x_position,
+            "y_position": row.y_position,
             "planets": []
         })
 
