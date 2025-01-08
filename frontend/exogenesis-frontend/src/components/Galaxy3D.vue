@@ -4,6 +4,7 @@
 
 <script>
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { onBeforeUnmount } from 'vue'
 
 export default {
@@ -12,6 +13,11 @@ export default {
       type: Array,
       required: true,
     },
+  },
+  data() {
+    return {
+      controls: null, // Declare the controls property
+    }
   },
   mounted() {
     // Three.js objects declared as regular variables
@@ -83,13 +89,22 @@ export default {
       // Render Loop
       const animate = () => {
         requestAnimationFrame(animate)
+        if (this.controls) {
+          this.controls.update() // Ensure controls are updated for damping
+        }
         renderer.render(scene, camera)
       }
+      this.controls = new OrbitControls(camera, renderer.domElement)
+      this.controls.enableDamping = true
+      this.controls.dampingFactor = 0.05
+      this.controls.minDistance = 50
+      this.controls.maxDistance = 1000
       animate()
     }
 
     // Initialize Three.js after component mounts
     initThreeJS()
+    //this.initOrbitControls();
 
     // Cleanup resources on unmount
     onBeforeUnmount(() => {

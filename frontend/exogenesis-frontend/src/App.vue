@@ -32,7 +32,7 @@ export default {
       fetch('http://127.0.0.1:8000/galaxy')
         .then((response) => response.json())
         .then((data) => {
-          this.galaxyData = Array.isArray(data) ? data : data.galaxy || []; // Adjust for potential object wrapping
+          this.galaxyData = Array.isArray(data) ? data : data.galaxy || [] // Adjust for potential object wrapping
           this.updateGalaxyStats()
         })
     },
