@@ -1,11 +1,24 @@
 import random
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import text
 from models import Star, Planet, Civilization
 from db import get_db
+from loguru import logger
 
 from fastapi.middleware.cors import CORSMiddleware
+
+# Configure Loguru
+logger.add(
+    "logs/backend.log",  # Save logs to a file
+    format="{time} {level} {message}",
+    rotation="1 MB",  # Rotate logs when they exceed 1MB
+    compression="zip",  # Compress old log files
+    serialize=True,  # Structured output as JSON
+    level="INFO",  # Set the logging level
+)
+
+logger.info("Logging initialized!")
 
 app = FastAPI()
 
@@ -25,6 +38,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
+    logger.info("Root endpoint accessed")
     return {"message": "Welcome to ExoGenesis!"}
 
 
@@ -113,3 +127,11 @@ async def get_galaxy(db: AsyncSession = Depends(get_db)):
             star["planets"].append(planet)
 
     return galaxy
+
+@app.get("/error")
+async def raise_error():
+    try:
+        1 / 0
+    except ZeroDivisionError as e:
+        logger.error(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail="Internal Server Error")
